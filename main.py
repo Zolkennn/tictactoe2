@@ -13,11 +13,11 @@ def verif(a, b):
     x = Etat[b][a]
     if Etat[b] == [str(x), str(x), str(x)]:  # verif ligne
         finit(x)
-    elif x == Etat[0][a] and x == Etat[1][a] and x == Etat[2][a]:  # verif colone
+    elif x == Etat[0][a] and x == Etat[1][a] and x == Etat[2][a]:  # verif colonne
         finit(x)
-    elif x == Etat[0][0] and x == Etat[1][1] and x == Etat[2][2]:  # verif cologne gauche droite
+    elif x == Etat[0][0] and x == Etat[1][1] and x == Etat[2][2]:  # verif diagonal gauche droite
         finit(x)
-    elif x == Etat[0][2] and x == Etat[1][1] and x == Etat[2][0]:  # verif cologne droite gauche
+    elif x == Etat[0][2] and x == Etat[1][1] and x == Etat[2][0]:  # verif diagonal droite gauche
         finit(x)
 
 
@@ -44,10 +44,10 @@ jeux.pack()
 
 boutons = [[0, 0, 0],
            [0, 0, 0],
-           [0, 0, 0]]  # contiendra tout les 9 bouton du plateau de jeux
+           [0, 0, 0]]  # contiendra tout les 9 boutons du plateau de jeux
 Etat = [[0, 0, 0],
         [0, 0, 0],
-        [0, 0, 0]]  # Etat du plateau 0=vide R=rouge V=Vert
+        [0, 0, 0]]  # état du plateau 0=vide R=rouge V=Vert
 
 # Double boucle qui crée les 9 boutons
 for i in range(3):
