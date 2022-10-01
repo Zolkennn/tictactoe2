@@ -1,8 +1,5 @@
 import random
 from tkinter import *
-from math import *
-import PIL.Image
-import PIL.ImageTk
 
 
 def finit(couleur):
@@ -21,25 +18,30 @@ def verif(a, b):
         finit(x)
 
 
-def click(a, b):
+def click(event, a, b):
     global joueur
     if joueur == "Rouge":
-        boutons[a][b].config(image=Mario_rouge, height=56, width=68, state=DISABLED)
+        boutons[a][b].create_image(36, 30, image=Mario_rouge)
         joueur = "Vert"
         Etat[b][a] = "R"
         verif(a, b)
     else:
-        boutons[a][b].config(image=Mario_Vert, height=56, width=68, state=DISABLED)
+        boutons[a][b].create_image(36, 30, image=Mario_Vert)
         joueur = "Rouge"
         Etat[b][a] = "V"
         verif(a, b)
 
 
-main = Tk()
 global Mario_rouge, Mario_Vert, Etat
+main = Tk()
+main.grid_rowconfigure(3, weight=1)
+main.grid_columnconfigure(3, weight=1)
+main.resizable(False, False)
+
 Mario_Vert = PhotoImage(file="sprites/mario_V.png")
 Mario_rouge = PhotoImage(file="sprites/mario_R.png")
-jeux = Frame(main, width=300, height=300)
+main.config(width=300, height=300)
+jeux = Frame(main, width=5000, height=5000)
 jeux.pack()
 
 boutons = [[0, 0, 0],
@@ -52,12 +54,10 @@ Etat = [[0, 0, 0],
 # Double boucle qui crée les 9 boutons
 for i in range(3):
     for x in range(3):
-        print("Maison")
-        boutons[i][x] = Button(jeux, width=6, height=3, command=lambda r=i, c=x: click(r, c))
+        boutons[i][x] = Canvas(jeux, width=68, height=56, background="red")
         boutons[i][x].grid(column=i, row=x)
-# main.resizable(False, False)
+        boutons[i][x].bind("<Button-1>", lambda e=0, x=i, y=x: click(e, x, y))
 joueur = random.choice(["Rouge", "Vert"])
 print(joueur)
-main.grid_rowconfigure(3, weight=1)
-main.grid_columnconfigure(3, weight=1)
+
 main.mainloop()
