@@ -3,7 +3,7 @@ from tkinter import *
 
 
 def finit(couleur):
-    #bloque tout les boutons
+    # bloque tout les boutons
     for i in range(3):
         for x in range(3):
             Clique[i][x] = False
@@ -63,10 +63,25 @@ Clique = [[True, True, True],
 # Double boucle qui crée les 9 boutons
 for i in range(3):
     for x in range(3):
-        boutons[i][x] = Canvas(jeux, width=68, height=56, background="#383838", highlightthickness=3, highlightbackground="#1e1e1e")
+        boutons[i][x] = Canvas(jeux, width=68, height=56, background="#383838", highlightthickness=3,
+                               highlightbackground="#1e1e1e")
         boutons[i][x].grid(column=i, row=x)
         boutons[i][x].bind("<Button-1>", lambda e=0, x=i, y=x: click(e, x, y))
 joueur = random.choice(["Rouge", "Vert"])
 print(joueur)
+
+menubar = Menu(main)
+menufichier = Menu(menubar, tearoff=0)
+menufichier.add_command(label="Relancé la manche")
+menufichier.add_command(label="Relancé la partie")
+menufichier.add_separator()
+menufichier.add_command(label="Quitter", command=main.destroy)
+menubar.add_cascade(label="Partie", menu=menufichier)
+
+menuaides = Menu(menubar, tearoff=0)
+menuaides.add_command(label="Info")  # TODO a faire !!!
+menubar.add_cascade(label="Info", menu=menuaides)
+
+main.config(menu=menubar)
 
 main.mainloop()
