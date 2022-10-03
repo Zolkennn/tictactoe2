@@ -3,6 +3,10 @@ from tkinter import *
 
 
 def finit(couleur):
+    #bloque tout les boutons
+    for i in range(3):
+        for x in range(3):
+            Clique[i][x] = False
     print("finit " + str(couleur))
 
 
