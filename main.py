@@ -1,9 +1,9 @@
 import random
-from tkinter import Tk, PhotoImage, Frame, Menu, Label, Canvas, BOTTOM
+from tkinter import Tk, PhotoImage, Frame, Menu, Label, Canvas, BOTTOM, messagebox
 
 
 def demaree_partie():
-    global Mario_rouge, Mario_Vert, Game_Over, main, score, zone_score, jeux, zone_joueur, joueur
+    global Mario_rouge, Mario_Vert, Game_Over, main, score, zone_score, jeux, zone_joueur, joueur, IA_on
     main = Tk()
     main.grid_rowconfigure(3, weight=1)
     main.grid_columnconfigure(3, weight=1)
@@ -36,21 +36,28 @@ def demaree_partie():
     zone_score = Label(main, text="Score: " + str(score[0]) + "R " + str(score[1]) + "V")
     zone_score.pack(side=BOTTOM)
     zone_joueur = Canvas(main, width=100, height=56, highlightthickness=0)
-    joueur = random.choice([Mario_rouge, Mario_Vert])
+    joueur = random.choice([Mario_Vert])  #Mario_rouge,
     print(str(joueur))
     zone_joueur.pack(side=BOTTOM)
     zone_joueur.create_image(50, 30, image=joueur)
+    IA_on = messagebox.askyesno(title="Nombre de joueur", message="Voulez vous joué contre une IA ?")
+    if IA_on:
+        messagebox.showinfo(title="important", message="Vous incarnerez le joueur rouge")
+        if joueur == Mario_Vert:
+            tour_ia()
 
 
 def plateau():
-    global Clique, boutons, Etat, c
+    global Clique, boutons, Etat, c, tours, commance, gagne
     c = 0
+    tours = 0
+    commance, gagne = False ,False
     boutons = [[0, 0, 0],
                [0, 0, 0],
                [0, 0, 0]]  # contiendra tout les 9 boutons du plateau de jeux
     Etat = [[0, 0, 0],
             [0, 0, 0],
-            [0, 0, 0]]  # état du plateau 0=vide R=rouge V=Vert
+            [0, 0, 0]]  # état du plateau 0=vide red=rouge green=Vert
     Clique = [[True, True, True],
               [True, True, True],
               [True, True, True]]
@@ -71,7 +78,7 @@ def redemare():
 
 
 def relance():
-    global jeux, joueur
+    global jeux, joueur, tours
     jeux.destroy()
     jeux = Frame(main)
     jeux.config(background="#2a2424")
@@ -151,8 +158,9 @@ def verif(a, b):
 
 
 def click(event, a, b):
-    global joueur
-    print(c)
+    global joueur, tours
+    tours += 1
+    print(tours)
     if Clique[a][b]:
         Clique[a][b] = False
         if joueur == Mario_rouge:
@@ -161,12 +169,45 @@ def click(event, a, b):
             joueur = Mario_Vert
             Etat[b][a] = "red"
             verif(a, b)
+            print(IA_on)
+            if IA_on:
+                print("tours IA")
+                tour_ia()
         else:
             boutons[a][b].create_image(36, 30, image=Mario_Vert)
             zone_joueur.create_image(50, 30, image=Mario_rouge)
             joueur = Mario_rouge
             Etat[b][a] = "green"
             verif(a, b)
+
+
+def tour_ia():
+    global commance, gagne
+    if tours == 0:
+        global xd,yd
+        xd, yd = random.choice([0, 2]), random.choice([0, 2])
+        commance = True
+        click(0, xd, yd)
+    elif tours == 2 and commance:
+        if not Clique[1][1]:
+            print("clic millieux")
+        else:
+            gagne = True
+            print(gagne)
+            click(0, 2-xd, yd)
+    elif tours == 4 and gagne:
+        if not Clique[0][yd] and Clique[1][yd] and not Clique[2][yd]:  #Ne devrait jamais arrivé si le joueur c'est joué
+            click(0, 1, yd)
+        else:
+            if Clique[0][1]:  #mal fait
+                click(0, xd, 2-yd)
+            else:
+                click(0, 2-xd, 2-yd)
+    elif tours == 6 and gagne:
+        if Clique[xd][1]:
+            click(0, xd, 1)
+        else:
+            click(0, 1, 1)
 
 
 demaree_partie()
