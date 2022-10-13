@@ -1,8 +1,8 @@
 import random
-from tkinter import *
+from tkinter import Tk, PhotoImage, Frame, Menu, Label, Canvas, BOTTOM
 
 
-def Demarée_Partie():
+def demaree_partie():
     global Mario_rouge, Mario_Vert, Game_Over, main, score, zone_score, jeux, zone_joueur, joueur
     main = Tk()
     main.grid_rowconfigure(3, weight=1)
@@ -67,7 +67,7 @@ def plateau():
 
 def redemare():
     main.destroy()
-    Demarée_Partie()
+    demaree_partie()
 
 
 def relance():
@@ -108,17 +108,16 @@ def ligne(couleur, type, ou):
     height = boutons[0][0].winfo_height()
     if type == "ligne":
         for i in range(3):
-            boutons[i][ou].create_line(0, height/2, width, height/2, fill="dark"+couleur, width=10)
+            boutons[i][ou].create_line(0, height / 2, width, height / 2, fill="dark" + couleur, width=10)
     if type == "colone":
         for i in range(3):
-            boutons[ou][i].create_line(width/2, 0, width/2, height, fill="dark"+couleur, width=10)
+            boutons[ou][i].create_line(width / 2, 0, width / 2, height, fill="dark" + couleur, width=10)
     if type == "diagonalGD":
         for i in range(3):
-            boutons[i][i].create_line(0, 0, width, height, fill="dark"+couleur, width=10)
+            boutons[i][i].create_line(0, 0, width, height, fill="dark" + couleur, width=10)
     if type == "diagonalDG":
         for i in range(3):
-            boutons[2-i][i].create_line(width, 0, 0, height, fill="dark"+couleur, width=10)
-
+            boutons[2 - i][i].create_line(width, 0, 0, height, fill="dark" + couleur, width=10)
 
 
 def egalite():
@@ -170,5 +169,5 @@ def click(event, a, b):
             verif(a, b)
 
 
-Demarée_Partie()
+demaree_partie()
 main.mainloop()
