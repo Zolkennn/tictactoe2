@@ -1,9 +1,10 @@
 import random
 from tkinter import Tk, PhotoImage, Frame, Menu, Label, Canvas, BOTTOM, messagebox
+from tkinter.simpledialog import askinteger
 
 
 def demaree_partie():
-    global Mario_rouge, Mario_Vert, Game_Over, main, score, zone_score, jeux, zone_joueur, joueur, IA_on
+    global Mario_rouge, Mario_Vert, Game_Over, main, score, zone_score, jeux, zone_joueur, joueur, IA_on, nombre_de_manche
     main = Tk()
     main.grid_rowconfigure(3, weight=1)
     main.grid_columnconfigure(3, weight=1)
@@ -45,6 +46,8 @@ def demaree_partie():
         messagebox.showinfo(title="important", message="Vous incarnerez le joueur rouge")
         if joueur == Mario_Vert:
             tour_ia()
+    nombre_de_manche = askinteger(title="Manche", prompt="Nombre de Manche ?")
+
 
 
 def plateau():
@@ -94,7 +97,8 @@ def relance():
 
 
 def finit(couleur):
-    global score
+    global score, nombre_de_manche
+    nombre_de_manche -= 1
     # bloque tous les boutons
     for i in range(3):
         for x in range(3):
@@ -108,6 +112,17 @@ def finit(couleur):
     else:
         score[1] += 3
     zone_score.config(text="Score: " + str(score[0]) + "R " + str(score[1]) + "V")
+    if nombre_de_manche <= 0:
+        maxe = max(score)
+        if score.index(maxe) == 1:
+            gagnant = "vert"
+        else:
+            gagnant = "rouge"
+        r = messagebox.askyesno(title="Finit", message="Le Vainceur est "+gagnant+". Voulez vous relancé une partie ?")
+        if r:
+            redemare()
+        else:
+            main.destroy()
 
 
 def ligne(couleur, type, ou):
@@ -145,14 +160,14 @@ def verif(a, b):
         finit(x)
         ligne(x, "ligne", b)
     elif x == Etat[0][a] and x == Etat[1][a] and x == Etat[2][a]:  # verif colonne
-        finit(x)
         ligne(x, "colone", a)
+        finit(x)
     elif x == Etat[0][0] and x == Etat[1][1] and x == Etat[2][2]:  # verif diagonal gauche droite
-        finit(x)
         ligne(x, "diagonalGD", 0)
-    elif x == Etat[0][2] and x == Etat[1][1] and x == Etat[2][0]:  # verif diagonal droite gauche
         finit(x)
+    elif x == Etat[0][2] and x == Etat[1][1] and x == Etat[2][0]:  # verif diagonal droite gauche
         ligne(x, "diagonalDG", 0)
+        finit(x)
     elif c == 9:
         egalite()
 
