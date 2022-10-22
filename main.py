@@ -157,8 +157,8 @@ def verif(a, b):
     c += 1
     x = Etat[b][a]
     if Etat[b] == [str(x), str(x), str(x)]:  # verif ligne
-        finit(x)
         ligne(x, "ligne", b)
+        finit(x)
     elif x == Etat[0][a] and x == Etat[1][a] and x == Etat[2][a]:  # verif colonne
         ligne(x, "colone", a)
         finit(x)
@@ -214,7 +214,7 @@ def tour_ia():
         if not Clique[0][yd] and Clique[1][yd] and not Clique[2][yd]:  #Ne devrait jamais arrivé si le joueur c'est joué
             click(0, 1, yd)
         else:
-            if Clique[0][1]:  #mal fait
+            if Clique[0][1] or Clique[0][2]:  #mal fait
                 click(0, xd, 2-yd)
             else:
                 click(0, 2-xd, 2-yd)
