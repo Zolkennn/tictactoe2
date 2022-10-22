@@ -4,10 +4,12 @@ from tkinter.simpledialog import askinteger
 
 
 def demaree_partie():
-    global Mario_rouge, Mario_Vert, Game_Over, main, score, zone_score, jeux, zone_joueur, joueur, IA_on, nombre_de_manche
+    global Mario_rouge, Mario_Vert, Game_Over, main, score, zone_score, jeux, zone_joueur, IA_on, nombre_de_manche
     main = Tk()
+    main.config(background="#1e1e1e")
     main.grid_rowconfigure(3, weight=1)
     main.grid_columnconfigure(3, weight=1)
+    main.eval('tk::PlaceWindow . center')
     main.resizable(False, False)
 
     Mario_Vert = PhotoImage(file="sprites/mario_V.png")
@@ -36,8 +38,7 @@ def demaree_partie():
 
     zone_score = Label(main, text="Score: " + str(score[0]) + "R " + str(score[1]) + "V")
     zone_score.pack(side=BOTTOM)
-    zone_joueur = Canvas(main, width=100, height=56, highlightthickness=0)
-    joueur = random.choice([Mario_Vert])  #Mario_rouge,
+    zone_joueur = Canvas(main, width=100, height=56,background='#383838', highlightthickness=0)
     print(str(joueur))
     zone_joueur.pack(side=BOTTOM)
     zone_joueur.create_image(50, 30, image=joueur)
@@ -51,18 +52,22 @@ def demaree_partie():
 
 def ndm():
     nombre_de_manche = askinteger(title="Manche", prompt="Nombre de Manche ?")
-    if nombre_de_manche > 0:
-        return nombre_de_manche
-    else:
-        print("erreur")
-        messagebox.showerror(message="Doit être strictement supérieur à 0")
+    try:
+        if nombre_de_manche > 0:
+            return nombre_de_manche
+        else:
+            print("erreur")
+            messagebox.showerror(message="Doit être strictement supérieur à 0")
+            ndm()
+    except TypeError:
         ndm()
 
+
 def plateau():
-    global Clique, boutons, Etat, c, tours, commance, gagne
+    global Clique, boutons, Etat, c, tours, commance, gagne, joueur
     c = 0
     tours = 0
-    commance, gagne = False ,False
+    commance, gagne = False, False
     boutons = [[0, 0, 0],
                [0, 0, 0],
                [0, 0, 0]]  # contiendra tout les 9 boutons du plateau de jeux
@@ -81,6 +86,7 @@ def plateau():
             boutons[i][x].grid(column=i, row=x)
             boutons[i][x].bind("<Button-1>", lambda e=0, x=i, y=x: click(e, x, y))
     main.update()
+    joueur = random.choice([Mario_Vert])  # Todo Mario_rouge,
 
 
 def redemare():
@@ -95,13 +101,18 @@ def relance():
     jeux.config(background="#2a2424")
     jeux.pack()
     joueur = random.choice([Mario_rouge, Mario_Vert])
-    print(str(joueur))
     zone_joueur.unbind("<Button-1>")
     zone_joueur.config(width=100, height=56, highlightthickness=0)
     zone_joueur.create_rectangle(0, 0, 100, 56, fill="lightgrey")
     zone_joueur.pack(side=BOTTOM)
     zone_joueur.create_image(50, 30, image=joueur)
     plateau()
+    zone_joueur.create_image(50, 30, image=joueur)
+    if IA_on:
+        messagebox.showinfo(title="important", message="Vous incarnerez le joueur rouge")
+        if joueur == Mario_Vert:
+            tours = 0
+            tour_ia()
 
 
 def finit(couleur):
@@ -124,9 +135,14 @@ def finit(couleur):
         maxe = max(score)
         if score.index(maxe) == 1:
             gagnant = "vert"
+            r = messagebox.askyesno(title="Finit",
+                                    message="Le Vainceur est " + gagnant + ". Voulez vous relancé une partie ?")
+        elif score[0] == score[1]:
+            r = messagebox.askyesno(title="Finit", message="Égalité. Voulez vous relancé une partie ?")
         else:
             gagnant = "rouge"
-        r = messagebox.askyesno(title="Finit", message="Le Vainceur est "+gagnant+". Voulez vous relancé une partie ?")
+            r = messagebox.askyesno(title="Finit",
+                                    message="Le Vainceur est " + gagnant + ". Voulez vous relancé une partie ?")
         if r:
             redemare()
         else:
@@ -183,7 +199,6 @@ def verif(a, b):
 def click(event, a, b):
     global joueur, tours
     tours += 1
-    print(tours)
     if Clique[a][b]:
         Clique[a][b] = False
         if joueur == Mario_rouge:
@@ -192,9 +207,7 @@ def click(event, a, b):
             joueur = Mario_Vert
             Etat[b][a] = "red"
             verif(a, b)
-            print(IA_on)
             if IA_on:
-                print("tours IA")
                 tour_ia()
         else:
             boutons[a][b].create_image(36, 30, image=Mario_Vert)
@@ -207,25 +220,26 @@ def click(event, a, b):
 def tour_ia():
     global commance, gagne
     if tours == 0:
-        global xd,yd
+        global xd, yd
         xd, yd = random.choice([0, 2]), random.choice([0, 2])
         commance = True
         click(0, xd, yd)
     elif tours == 2 and commance:
         if not Clique[1][1]:
-            print("clic millieux")
+            print("clic millieux") # Todo a faire
         else:
             gagne = True
             print(gagne)
-            click(0, 2-xd, yd)
+            click(0, 2 - xd, yd)
     elif tours == 4 and gagne:
-        if not Clique[0][yd] and Clique[1][yd] and not Clique[2][yd]:  #Ne devrait jamais arrivé si le joueur c'est joué
+        if not Clique[0][yd] and Clique[1][yd] and not Clique[2][
+            yd]:  # Ne devrait jamais arrivé si le joueur c'est joué
             click(0, 1, yd)
         else:
-            if Clique[0][1] or Clique[0][2]:  #mal fait
-                click(0, xd, 2-yd)
+            if Clique[0][1] or Clique[0][2]:  # mal fait
+                click(0, xd, 2 - yd)
             else:
-                click(0, 2-xd, 2-yd)
+                click(0, 2 - xd, 2 - yd)
     elif tours == 6 and gagne:
         if Clique[xd][1]:
             click(0, xd, 1)
