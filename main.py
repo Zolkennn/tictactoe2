@@ -219,6 +219,7 @@ def click(event, a, b):
 
 def tour_ia():
     global commance, gagne
+    #Todo verif si l'ia peux pas gagné le tours et nouveaux tableau avec que les endroit de l'ia
     if tours == 0:
         global xd, yd
         xd, yd = random.choice([0, 2]), random.choice([0, 2])
@@ -230,10 +231,15 @@ def tour_ia():
         else:
             gagne = True
             print(gagne)
-            click(0, 2 - xd, yd)
+            if Clique[2-xd][0] and Clique[2-xd][1] and Clique[2-xd][2] and Clique[1][2]:
+                click(0, 2 - xd, yd)
+            else:
+                click(0, xd, 2 - yd)
+
+
+
     elif tours == 4 and gagne:
-        if not Clique[0][yd] and Clique[1][yd] and not Clique[2][
-            yd]:  # Ne devrait jamais arrivé si le joueur c'est joué
+        if not Clique[0][yd] and Clique[1][yd] and not Clique[2][yd]:  # Ne devrait jamais arrivé si le joueur c'est joué
             click(0, 1, yd)
         else:
             if Clique[0][1] or Clique[0][2]:  # mal fait
