@@ -42,13 +42,21 @@ def demaree_partie():
     zone_joueur.pack(side=BOTTOM)
     zone_joueur.create_image(50, 30, image=joueur)
     IA_on = messagebox.askyesno(title="Nombre de joueur", message="Voulez vous joué contre une IA ?")
+    nombre_de_manche = ndm()
     if IA_on:
         messagebox.showinfo(title="important", message="Vous incarnerez le joueur rouge")
         if joueur == Mario_Vert:
             tour_ia()
+
+
+def ndm():
     nombre_de_manche = askinteger(title="Manche", prompt="Nombre de Manche ?")
-
-
+    if nombre_de_manche > 0:
+        return nombre_de_manche
+    else:
+        print("erreur")
+        messagebox.showerror(message="Doit être strictement supérieur à 0")
+        ndm()
 
 def plateau():
     global Clique, boutons, Etat, c, tours, commance, gagne
