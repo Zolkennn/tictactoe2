@@ -39,7 +39,6 @@ def demaree_partie():
     zone_score = Label(main, text="Score: " + str(score[0]) + "R " + str(score[1]) + "V")
     zone_score.pack(side=BOTTOM)
     zone_joueur = Canvas(main, width=100, height=56,background='#383838', highlightthickness=0)
-    print(str(joueur))
     zone_joueur.pack(side=BOTTOM)
     zone_joueur.create_image(50, 30, image=joueur)
     IA_on = messagebox.askyesno(title="Nombre de joueur", message="Voulez vous joué contre une IA ?")
@@ -47,7 +46,7 @@ def demaree_partie():
     if IA_on:
         messagebox.showinfo(title="important", message="Vous incarnerez le joueur rouge")
         if joueur == Mario_Vert:
-            tour_ia()
+            tour_ia(True)
 
 
 def ndm():
@@ -56,7 +55,6 @@ def ndm():
         if nombre_de_manche > 0:
             return nombre_de_manche
         else:
-            print("erreur")
             messagebox.showerror(message="Doit être strictement supérieur à 0")
             ndm()
     except TypeError:
@@ -64,10 +62,11 @@ def ndm():
 
 
 def plateau():
-    global Clique, boutons, Etat, c, tours, commance, gagne, joueur
+    global Clique, boutons, Etat, c, tours, commance, winable, joueur, Clique_joueurs, finito
     c = 0
     tours = 0
-    commance, gagne = False, False
+    finito = False
+    commance, winable = False, False
     boutons = [[0, 0, 0],
                [0, 0, 0],
                [0, 0, 0]]  # contiendra tout les 9 boutons du plateau de jeux
@@ -112,11 +111,12 @@ def relance():
         messagebox.showinfo(title="important", message="Vous incarnerez le joueur rouge")
         if joueur == Mario_Vert:
             tours = 0
-            tour_ia()
+            tour_ia(True)
 
 
 def finit(couleur):
-    global score, nombre_de_manche
+    global score, nombre_de_manche, finito
+    finito = True
     nombre_de_manche -= 1
     # bloque tous les boutons
     for i in range(3):
@@ -136,13 +136,13 @@ def finit(couleur):
         if score.index(maxe) == 1:
             gagnant = "vert"
             r = messagebox.askyesno(title="Finit",
-                                    message="Le Vainceur est " + gagnant + ". Voulez vous relancé une partie ?")
+                                    message="Le gagnant est " + gagnant + ". Voulez vous relancé une partie ?")
         elif score[0] == score[1]:
             r = messagebox.askyesno(title="Finit", message="Égalité. Voulez vous relancé une partie ?")
         else:
             gagnant = "rouge"
             r = messagebox.askyesno(title="Finit",
-                                    message="Le Vainceur est " + gagnant + ". Voulez vous relancé une partie ?")
+                                    message="Le gagnant est " + gagnant + ". Voulez vous relancé une partie ?")
         if r:
             redemare()
         else:
@@ -171,6 +171,7 @@ def egalite():
     zone_joueur.bind("<Button-1>", lambda x=1: relance())
     zone_joueur.config(width=256, height=206)
     zone_joueur.create_rectangle(0, 0, 256, 206, fill="lightgrey")
+    zone_joueur.create_image(128, 103, image=Game_Over)
     score[0] += 1
     score[1] += 1
     zone_score.config(text="Score: " + str(score[0]) + "R " + str(score[1]) + "V")
@@ -199,16 +200,16 @@ def verif(a, b):
 def click(event, a, b):
     global joueur, tours
     tours += 1
-    if Clique[a][b]:
-        Clique[a][b] = False
+    if Clique[b][a]:
+        Clique[b][a] = False
         if joueur == Mario_rouge:
             boutons[a][b].create_image(36, 30, image=Mario_rouge)
             zone_joueur.create_image(50, 30, image=Mario_Vert)
             joueur = Mario_Vert
             Etat[b][a] = "red"
             verif(a, b)
-            if IA_on:
-                tour_ia()
+            if IA_on and not finito:
+                tour_ia(True)
         else:
             boutons[a][b].create_image(36, 30, image=Mario_Vert)
             zone_joueur.create_image(50, 30, image=Mario_rouge)
@@ -217,41 +218,54 @@ def click(event, a, b):
             verif(a, b)
 
 
-def tour_ia():
-    global commance, gagne
-    #Todo verif si l'ia peux pas gagné le tours et nouveaux tableau avec que les endroit de l'ia
-    if tours == 0:
-        global xd, yd
-        xd, yd = random.choice([0, 2]), random.choice([0, 2])
-        commance = True
-        click(0, xd, yd)
-    elif tours == 2 and commance:
-        if not Clique[1][1]:
-            print("clic millieux") # Todo a faire
-        else:
-            gagne = True
-            print(gagne)
-            if Clique[2-xd][0] and Clique[2-xd][1] and Clique[2-xd][2] and Clique[1][2]:
-                click(0, 2 - xd, yd)
+def tour_ia(premier_tour):
+    global commance, winable, colone
+    if premier_tour:
+        if tours == 0:
+            global xd, yd
+            xd, yd = random.choice([0, 2]), random.choice([0, 2])
+            commance = True
+            click(0, xd, yd)
+        elif tours == 2 and commance:
+            if Clique[1][1]:
+                winable = True
+                if Clique[0][2-xd] and Clique[1][2-xd] and Clique[2][2-xd] and Clique[2][1]:
+                    colone = False
+                    click(0, 2 - xd, yd)
+                else:
+                    colone = True
+                    click(0, xd, 2 - yd)
             else:
-                click(0, xd, 2 - yd)
-
-
-
-    elif tours == 4 and gagne:
-        if not Clique[0][yd] and Clique[1][yd] and not Clique[2][yd]:  # Ne devrait jamais arrivé si le joueur c'est joué
-            click(0, 1, yd)
-        else:
-            if Clique[0][1] or Clique[0][2]:  # mal fait
-                click(0, xd, 2 - yd)
+                winable = False
+                clicrandom()
+        elif tours == 4 and winable:
+            if not colone:
+                if not Clique[yd][0] and Clique[yd][1] and not Clique[yd][2]:  # Ne devrait jamais arrivé si le joueur c'est joué
+                    click(0, 1, yd) # Manche finit
+                else:
+                    click(0, 2-xd, 2-yd)
             else:
-                click(0, 2 - xd, 2 - yd)
-    elif tours == 6 and gagne:
-        if Clique[xd][1]:
-            click(0, xd, 1)
+                if not Clique[0][xd] and Clique[1][xd] and not Clique[2][xd]:  # Ne devrait jamais arrivé si le joueur c'est joué
+                    click(0, xd, 1)  # Manche finit
+                else:
+                    click(0, 2 - xd, 2 - yd)
+        elif tours == 6 and winable:
+            if not Clique[1][1]:
+                if colone:
+                    click(0, 1, 2-yd) # Manche finit
+                else:
+                    click(0, 2 - xd, 1)
+            else:
+                click(0, 1, 1) # Manche finit
         else:
-            click(0, 1, 1)
-
+            clicrandom()
+def clicrandom():
+    while True:
+        randx = random.randint(0, 2)
+        randy = random.randint(0, 2)
+        if Clique[randx][randy]:
+            click(0, randy, randx)
+            break
 
 demaree_partie()
 main.mainloop()
